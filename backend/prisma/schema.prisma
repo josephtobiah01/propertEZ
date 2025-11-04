@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+
+
+// ============================================
+// CORE MODELS
+// ============================================
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  name String?
+  phone String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  //Relationsships
+  properties Property[]
+
+  @@map("users")
+}
+
+model Property {
+  id Int @id @default(autoincrement())
+  ownderId Int @map("owner_id")
+  address String
+  city String
+  state String
+  zipCode String? @map("zip_code")
+  latitude Float?
+  longitude Float?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  //Relationships
+  owner User @relation(fields: [ownderId], references: [id], onDelete: Cascade)
+  listings Listing[]
+
+  //Indexes for performance
+  @@index([city])
+  @@index([ownderId])
+  @@map("properties")
+}
+
+model Listing {
+  id Int @id @default(autoincrement())
+  propertyId Int @map("property_id")
+  title String
+  description String?
+  price Decimal @db.Decimal(10, 2)
+  bedrooms Int
+  bathrooms Int
+  sqft Int
+  listingType ListingType
+  category PropertyCategory
+  amenities String[]
+  images String[]
+  available Boolean @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  //Relationships
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  //Indexes
+  @@index([listingType])
+  @@index([category])
+  @@index([price])
+  @@index([bedrooms])
+  @@map("listings")
+}
+
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum ListingType {
+  Sale
+  Rent
+  Lease
+}
+
+
+enum PropertyCategory {
+  Condo
+  HouseAndLot
+  Pasalo
+  Apartment
+}
+
+
