@@ -37,10 +37,10 @@ model User {
 
 model Property {
   id Int @id @default(autoincrement())
-  ownderId Int @map("owner_id")
+  ownerId Int @map("owner_id")
   address String
   city String
-  state String
+  province String
   zipCode String? @map("zip_code")
   latitude Float?
   longitude Float?
@@ -48,12 +48,12 @@ model Property {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   //Relationships
-  owner User @relation(fields: [ownderId], references: [id], onDelete: Cascade)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   listings Listing[]
 
   //Indexes for performance
   @@index([city])
-  @@index([ownderId])
+  @@index([ownerId])
   @@map("properties")
 }
 
